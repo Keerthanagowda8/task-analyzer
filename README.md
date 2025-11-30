@@ -1,4 +1,3 @@
-`markdown
 # Smart Task Analyzer
 
 A Django-based task prioritization tool that calculates a "Priority Score" for tasks based on Urgency (Due Date), Importance, and Effort. This project uses `uv` for modern, fast Python package management.
@@ -169,6 +168,4 @@ task-analyzer/
 ├── manage.py              # Django command-line utility
 ├── pyproject.toml         # Dependency configuration
 └── uv.lock                # Locked versions of dependencies
-```
-
 ```
