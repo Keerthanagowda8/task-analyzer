@@ -8,25 +8,71 @@ from tasks.models import Task
 
 def calculate_score(task):
     score = 0
-    due_date_str = task.get('due_date') 
-    if due_date_str:
+    due_date = task.get('due_date')
+    if due_date:
         try:
-            due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
-            today = date.today()
-            days_left = (due_date - today).days
-            if days_left < 0:
-                score += 100  
-            elif days_left <= 3:
-                score += 50   
-            elif days_left <= 7:
-                score += 20      
-        except ValueError:
-            pass
+            due_obj = datetime.strptime(str(due_date), '%Y-%m-%d').date()
+            days_until_due = (due_obj - datetime.now().date()).days
+            
+            if days_until_due < 0:
+                overdue_days = abs(days_until_due)
+                score += 35 + min(15, overdue_days) 
+            elif days_until_due == 0:
+                score += 35  
+            elif days_until_due == 1:
+                score += 30 
+            elif days_until_due <= 3:
+                score += 25  
+            elif days_until_due <= 7:
+                score += 18  
+            elif days_until_due <= 14:
+                score += 12  
+            elif days_until_due <= 30:
+                score += 6   
+            else:
+                score += 2   
+        except Exception:
+            score += 8  
+    else:
+        score += 8  
+
     importance = task.get('importance', 5)
-    score += (importance * 5)
-    hours = task.get('estimated_hours', 1)
-    if hours < 2:
-        score += 20   
+    try:
+        importance = max(1, min(10, int(importance)))
+        if importance >= 9:
+            score += 30
+        elif importance >= 7:
+            score += 24
+        elif importance >= 5:
+            score += 18
+        elif importance >= 3:
+            score += 12
+        else:
+            score += 6
+    except Exception:
+        score += 15  
+
+    estimated_hours = task.get('estimated_hours')
+    if estimated_hours is not None:
+        try:
+            hours = float(estimated_hours)
+            if hours <= 0:
+                score += 10  
+            elif hours < 1:
+                score += 20  
+            elif hours <= 2:
+                score += 16  
+            elif hours <= 4:
+                score += 12  
+            elif hours <= 8:
+                score += 8  
+            else:
+                score += 4   
+        except Exception:
+            score += 10
+    else:
+        score += 10  
+
     return score
 
 @csrf_exempt
